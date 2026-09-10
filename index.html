@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رادار الجنيه</title>
+<meta name="description" content="لوحة تفاعلية لمتابعة الدولار واليورو مقابل الجنيه المصري بأسعار بنك مصر والبنك العربي الدولي، مع تحليل فني وروبوت توقعات وإدارة مخاطر.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@300;400;500;700;800&display=swap">
+<style>
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+:root{
+  --bg:#f5f1e6;--surface:#ffffff;--surface-2:#efe8d6;--surface-3:#e7dfc7;
+  --border:#ddd2b0;--border-strong:#c7b98d;
+  --text:#231f16;--text-dim:#5c5642;--text-faint:#8c8467;
+  --accent:#0e6e86;--accent-2:#0a5468;--accent-ink:#ffffff;--gold:#a8791a;
+  --good:#1c8a55;--good-bg:rgba(28,138,85,.10);
+  --bad:#c0392b;--bad-bg:rgba(192,57,43,.10);
+  --warn:#a8791a;--warn-bg:rgba(168,121,26,.10);
+  --info:#0e6e86;--info-bg:rgba(14,110,134,.08);
+  --bm:#eb6834;--aib:#2a78d6;--avg:#4a3aa7;
+  --shadow-1:0 1px 2px rgba(35,31,22,.05);--shadow-2:0 10px 28px -14px rgba(35,31,22,.20);
+  --radius:14px;--radius-sm:9px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a1210;--surface:#111c19;--surface-2:#16221f;--surface-3:#1d2e28;
+    --border:#24352e;--border-strong:#32473e;
+    --text:#edf2ee;--text-dim:#9bb1a8;--text-faint:#5c716a;
+    --accent:#4bb8d6;--accent-2:#3aa0bd;--accent-ink:#04211f;--gold:#e0b64c;
+    --good:#33c98a;--good-bg:rgba(51,201,138,.13);
+    --bad:#ff6b5e;--bad-bg:rgba(255,107,94,.13);
+    --warn:#e0b64c;--warn-bg:rgba(224,182,76,.13);
+    --info:#4bb8d6;--info-bg:rgba(75,184,214,.10);
+    --bm:#d95926;--aib:#3987e5;--avg:#9085e9;
+    --shadow-1:0 1px 2px rgba(0,0,0,.35);--shadow-2:0 16px 34px -16px rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a1210;--surface:#111c19;--surface-2:#16221f;--surface-3:#1d2e28;
+  --border:#24352e;--border-strong:#32473e;
+  --text:#edf2ee;--text-dim:#9bb1a8;--text-faint:#5c716a;
+  --accent:#4bb8d6;--accent-2:#3aa0bd;--accent-ink:#04211f;--gold:#e0b64c;
+  --good:#33c98a;--good-bg:rgba(51,201,138,.13);
+  --bad:#ff6b5e;--bad-bg:rgba(255,107,94,.13);
+  --warn:#e0b64c;--warn-bg:rgba(224,182,76,.13);
+  --info:#4bb8d6;--info-bg:rgba(75,184,214,.10);
+  --bm:#d95926;--aib:#3987e5;--avg:#9085e9;
+  --shadow-1:0 1px 2px rgba(0,0,0,.35);--shadow-2:0 16px 34px -16px rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Tajawal',system-ui,sans-serif;direction:rtl;font-variant-numeric:tabular-nums;line-height:1.5}
+h1,h2,h3,h4{font-family:'Cairo',system-ui,sans-serif;margin:0;text-wrap:balance}
+p{margin:0}
+button{font-family:inherit}
+::selection{background:var(--accent);color:var(--accent-ink)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:8px}
+
+.wrap{max-width:1360px;margin:0 auto;padding-inline:18px}
+.topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-in{display:flex;align-items:center;gap:16px;padding-block:11px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(150deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:var(--accent-ink);font-size:16px;flex:none;box-shadow:var(--shadow-1)}
+.brand h1{font-size:16px;font-weight:900}
+.brand p{font-size:10.5px;color:var(--text-faint);margin-top:1px}
+.tabs{display:flex;gap:3px;flex-wrap:wrap;background:var(--surface-2);padding:3px;border-radius:11px;border:1px solid var(--border)}
+.tab-btn{border:none;background:transparent;color:var(--text-dim);font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap;font-family:'Tajawal'}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.on{background:var(--surface);color:var(--accent);box-shadow:var(--shadow-1)}
+.top-right{display:flex;align-items:center;gap:10px;margin-inline-start:auto;color:var(--text-dim);font-size:11.5px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--good);animation:pulse 2.2s ease-in-out infinite;flex:none}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(28,138,85,.5)}50%{box-shadow:0 0 0 5px rgba(28,138,85,0)}}
+@media(prefers-reduced-motion:reduce){.pulse{animation:none}}
+
+.notice{display:flex;gap:10px;align-items:flex-start;background:var(--info-bg);border:1px solid color-mix(in srgb,var(--info) 35%,transparent);border-radius:var(--radius-sm);padding:11px 14px;font-size:12px;color:var(--text-dim);margin-block:14px}
+.notice i{color:var(--info);margin-top:2px;flex:none}
+.notice b{color:var(--text);font-weight:800}
+.notice a{color:var(--accent);font-weight:700;text-decoration:none;border-bottom:1px dashed var(--accent)}
+
+.curbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:3px;gap:3px}
+.seg button{border:none;background:transparent;color:var(--text-dim);font-weight:800;font-size:12.5px;padding:7px 16px;border-radius:7px;cursor:pointer;font-family:'Cairo'}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow-1)}
+.seg button.on .dot{opacity:1}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-inline-end:5px;opacity:.55}
+.upd-info{font-size:11px;color:var(--text-faint);margin-inline-end:auto}
+.upd-info b{color:var(--text-dim)}
+.btn{border:1px solid var(--border-strong);background:var(--surface);color:var(--text);font-weight:700;font-size:11.5px;padding:8px 14px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-accent{background:linear-gradient(150deg,var(--accent),var(--accent-2));border-color:transparent;color:var(--accent-ink)}
+.btn-accent:hover{color:var(--accent-ink);opacity:.92}
+.btn-good{background:linear-gradient(150deg,var(--good),color-mix(in srgb,var(--good) 60%,black));border-color:transparent;color:#fff}
+.btn-bad{background:linear-gradient(150deg,var(--bad),color-mix(in srgb,var(--bad) 60%,black));border-color:transparent;color:#fff}
+
+.tp{display:none}.tp.on{display:block;animation:fu .3s ease}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.grid{display:grid;gap:12px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.gmain{grid-template-columns:1.6fr 1fr}
+@media(max-width:1050px){.g4{grid-template-columns:repeat(2,1fr)}.gmain{grid-template-columns:1fr}}
+@media(max-width:640px){.g4,.g3,.g2{grid-template-columns:1fr}.topbar-in{flex-direction:column;align-items:stretch}.top-right{margin-inline-start:0}}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-1)}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.card-h h3{font-size:13.5px;font-weight:800}
+.card-h p{font-size:10.5px;color:var(--text-faint);margin-top:1px}
+.eyebrow{font-size:10px;letter-spacing:.06em;color:var(--text-faint);font-weight:700;text-transform:uppercase}
+
+.stat-lbl{font-size:11px;color:var(--text-faint);font-weight:600}
+.stat-num{font-size:24px;font-weight:900;font-family:'Cairo';margin-top:3px}
+.stat-sub{font-size:10.5px;color:var(--text-faint);margin-top:3px}
+.chg{display:inline-flex;align-items:center;gap:3px;font-weight:800;font-size:11.5px}
+.chg.up{color:var(--good)}.chg.dn{color:var(--bad)}.chg.nt{color:var(--text-faint)}
+
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11.5px;font-weight:800;font-family:'Cairo'}
+.b-good{background:var(--good-bg);color:var(--good);border:1px solid color-mix(in srgb,var(--good) 35%,transparent)}
+.b-bad{background:var(--bad-bg);color:var(--bad);border:1px solid color-mix(in srgb,var(--bad) 35%,transparent)}
+.b-warn{background:var(--warn-bg);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent)}
+.b-info{background:var(--info-bg);color:var(--info);border:1px solid color-mix(in srgb,var(--info) 35%,transparent)}
+
+.chip{border:1px solid var(--border);background:var(--surface-2);color:var(--text-dim);font-size:11px;font-weight:700;padding:5px 12px;border-radius:7px;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chiprow{display:flex;gap:5px;flex-wrap:wrap}
+
+.bankrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+.bankrow:last-child{border-bottom:none}
+.bank-id{display:flex;align-items:center;gap:9px}
+.bank-sw{width:9px;height:34px;border-radius:4px;flex:none}
+.bank-name{font-size:13px;font-weight:800}
+.bank-sub{font-size:10px;color:var(--text-faint)}
+.bank-px{text-align:left}
+.bank-px b{font-size:15px;font-family:'Cairo'}
+.spread-pill{font-size:10px;color:var(--text-faint)}
+
+.meter{position:relative;height:9px;border-radius:5px;background:linear-gradient(90deg,var(--good) 0%,var(--warn) 45%,var(--warn) 55%,var(--bad) 100%);margin-block:6px}
+.meter i{position:absolute;top:-4px;width:3px;height:17px;background:var(--text);border-radius:2px;transform:translateX(50%);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.meter-lbls{display:flex;justify-content:space-between;font-size:9.5px;color:var(--text-faint)}
+
+.rowline{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.rowline:last-child{border-bottom:none}
+.rowline .k{color:var(--text-dim)}
+.rowline .v{font-weight:800;font-family:'Cairo'}
+
+.ladder{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden}
+.ladder-row{display:flex;justify-content:space-between;padding:8px 12px;font-size:11.5px;border-bottom:1px solid var(--border)}
+.ladder-row:last-child{border-bottom:none}
+.ladder-row.res{background:var(--bad-bg);color:var(--bad)}
+.ladder-row.sup{background:var(--good-bg);color:var(--good)}
+.ladder-row.pp{background:var(--warn-bg);color:var(--warn);font-weight:800}
+.ladder-row.now{background:var(--accent);color:var(--accent-ink);font-weight:900;box-shadow:var(--shadow-2)}
+.ladder-row b{font-family:'Cairo'}
+
+.hbars{display:flex;align-items:flex-end;gap:2px;height:38px}
+.hbars i{flex:1;border-radius:2px 2px 0 0;min-height:2px}
+
+.tf-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px;background:var(--surface-2)}
+.tf-card .tf-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tf-card .tf-h span{font-size:11.5px;font-weight:800;color:var(--text-dim)}
+.tf-range{font-size:17px;font-weight:900;font-family:'Cairo'}
+.conf-bar{height:5px;border-radius:3px;background:var(--border);overflow:hidden;margin-top:8px}
+.conf-fill{height:100%;border-radius:3px}
+
+.rule{display:flex;gap:10px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface-2)}
+.rule-num{width:30px;height:30px;border-radius:8px;background:var(--info-bg);color:var(--info);display:flex;align-items:center;justify-content:center;flex:none;font-size:11.5px;font-weight:900;font-family:'Cairo'}
+.rule b{font-size:12.5px;display:block;margin-bottom:2px}
+.rule p{font-size:11.5px;color:var(--text-dim)}
+
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;color:var(--text-dim);font-weight:700}
+.field input,.field select{background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:9px 11px;border-radius:8px;font-family:inherit;font-size:13px;width:100%}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent)}
+
+.result-box{background:var(--surface-2);border:1px dashed var(--border-strong);border-radius:var(--radius-sm);padding:13px;text-align:center}
+.result-box .n{font-size:19px;font-weight:900;font-family:'Cairo'}
+.result-box .l{font-size:10.5px;color:var(--text-faint);margin-top:3px}
+
+.le{padding:10px 11px;border-radius:8px;margin-bottom:6px;font-size:11.5px;background:var(--surface-2);border-inline-start:3px solid var(--border-strong)}
+.le.buy{border-inline-start-color:var(--good)}
+.le.sell{border-inline-start-color:var(--bad)}
+
+.disc{font-size:10.5px;color:var(--text-faint);line-height:1.7;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px}
+.disc b{color:var(--text-dim)}
+
+footer{border-top:1px solid var(--border);margin-top:26px;padding-block:20px}
+footer .links{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;margin-bottom:10px}
+footer a{color:var(--accent);text-decoration:none;font-weight:700}
+footer a:hover{text-decoration:underline}
+
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120px);padding:11px 20px;border-radius:11px;font-weight:700;font-size:12.5px;z-index:999;transition:transform .4s cubic-bezier(.34,1.56,.64,1);backdrop-filter:blur(12px);font-family:'Tajawal';box-shadow:var(--shadow-2)}
+.toast.sh{transform:translateX(-50%) translateY(0)}
+.toast.gn{background:var(--good-bg);border:1px solid var(--good);color:var(--good)}
+.toast.rd{background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad)}
+.toast.bl{background:var(--info-bg);border:1px solid var(--info);color:var(--info)}
+
+.edit-panel{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--border-strong)}
+.edit-panel.on{display:block}
+.edit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:760px){.edit-grid{grid-template-columns:repeat(2,1fr)}}
+canvas{max-width:100%}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <div class="brand">
+      <div class="brand-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M12 12 L19 6"/><path d="M15.5 4.5 A9 9 0 0 1 19.5 9.5" opacity=".85"/><path d="M13.5 8 A4.2 4.2 0 0 1 16 10.5" opacity=".7"/><path d="M3 20 Q12 12 21 20" opacity=".55"/></svg></div>
+      <div><h1>رادار الجنيه</h1><p>الدولار واليورو مقابل الجنيه المصري</p></div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="أقسام اللوحة">
+      <button class="tab-btn on" data-tab="dash" onclick="goTab('dash',this)">لوحة التحكم</button>
+      <button class="tab-btn" data-tab="tech" onclick="goTab('tech',this)">التحليل الفني</button>
+      <button class="tab-btn" data-tab="bot" onclick="goTab('bot',this)">روبوت التوقعات</button>
+      <button class="tab-btn" data-tab="risk" onclick="goTab('risk',this)">إدارة المخاطر</button>
+      <button class="tab-btn" data-tab="sim" onclick="goTab('sim',this)">محاكاة التحويل</button>
+    </nav>
+    <div class="top-right">
+      <span class="pulse"></span><span id="clk">--:--:--</span>
+      <button class="btn" onclick="doRefresh()" aria-label="تحديث"><svg id="refIco" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<div class="notice">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:2px;color:var(--info)"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.7" r="1.1" fill="currentColor" stroke="none"/></svg>
+  <div>
+    <b>كيف يعمل الربط بالسوق المصري:</b> هذه النسخة مُعدّة لتُقرأ أسعارها تلقائياً من ملف <code>data/rates.json</code> الذي تُحدّثه مهمة GitHub Action مرفقة مع المشروع كل ساعتين تقريباً من نشرتي <b>بنك مصر</b> و<b>البنك العربي الدولي</b> (راجع ملف README لتفعيلها). إن لم تُفعَّل بعد أو تعذّر الوصول للملف، تعمل اللوحة بآخر سعر محفوظ محلياً أو بزر التحديث اليدوي أدناه. كل المؤشرات والتوقعات تُحسب اعتماداً على آخر سعر متاح، أما الرسم التاريخي فهو <b>توضيحي</b> وليس بيانات فعلية مسجلة.
+    <div style="margin-top:6px">
+      <a href="https://www.banquemisr.com/Home/CAPITAL%20MARKETS/Exchange%20rates%20and%20currencies?sc_lang=ar-EG" target="_blank" rel="noopener">نشرة بنك مصر ↗</a>
+      &nbsp;·&nbsp;
+      <a href="https://ta3weem.com/en/banks/arab-international-bank-aib" target="_blank" rel="noopener">أسعار البنك العربي الدولي ↗</a>
+      &nbsp;·&nbsp;
+      <a href="https://www.cbe.org.eg/en/economic-research/statistics/cbe-exchange-rates" target="_blank" rel="noopener">البنك المركزي المصري ↗</a>
+    </div>
+  </div>
+</div>
+
+<div class="curbar">
+  <div class="seg" id="curSeg">
+    <button class="on" data-c="USD" onclick="setCur('USD',this)"><span class="dot" style="background:var(--gold)"></span>دولار أمريكي / جنيه</button>
+    <button data-c="EUR" onclick="setCur('EUR',this)"><span class="dot" style="background:var(--avg)"></span>يورو / جنيه</button>
+  </div>
+  <span class="upd-info">آخر مزامنة: <b id="updWhen">--</b></span>
+  <span class="upd-info" id="autoStatus" style="font-weight:700">--</span>
+  <button class="btn" onclick="toggleEdit()">✎ تحديث الأسعار يدوياً</button>
+</div>
+
+<div class="card edit-panel" id="editPanel">
+  <div class="card-h"><h3>إدخال أسعار اليوم</h3><p>انسخها من النشرة الرسمية ثم اضغط حفظ</p></div>
+  <div class="edit-grid">
+    <div class="field"><label>بنك مصر - شراء</label><input type="number" step="0.01" id="e_bm_buy"></div>
+    <div class="field"><label>بنك مصر - بيع</label><input type="number" step="0.01" id="e_bm_sell"></div>
+    <div class="field"><label>العربي الدولي - شراء</label><input type="number" step="0.01" id="e_aib_buy"></div>
+    <div class="field"><label>العربي الدولي - بيع</label><input type="number" step="0.01" id="e_aib_sell"></div>
+  </div>
+  <div style="margin-top:10px;display:flex;gap:8px"><button class="btn btn-accent" onclick="saveEdit()">حفظ وتحديث اللوحة</button><button class="btn" onclick="toggleEdit()">إلغاء</button></div>
+</div>
+
+<!-- ============ لوحة التحكم ============ -->
+<section id="p-dash" class="tp on">
+  <div class="grid g4" style="margin-block:14px">
+    <div class="card"><span class="stat-lbl">متوسط سعر الشراء</span><p class="stat-num" id="dBuy">--</p><p class="stat-sub" id="dBuyC">--</p></div>
+    <div class="card"><span class="stat-lbl">متوسط سعر البيع</span><p class="stat-num" id="dSell">--</p><p class="stat-sub" id="dSellC">--</p></div>
+    <div class="card"><span class="stat-lbl">فارق البنوك (سبريد)</span><p class="stat-num" id="dSpread">--</p><p class="stat-sub" id="dSpreadP">--</p></div>
+    <div class="card"><span class="stat-lbl">الإشارة قصيرة المدى</span><p style="margin-top:6px" id="dSigShort">--</p><p class="stat-sub" style="margin-top:6px">طويلة المدى: <span id="dSigLong">--</span></p></div>
+  </div>
+
+  <div class="grid gmain" style="margin-bottom:12px">
+    <div class="card">
+      <div class="card-h">
+        <div><h3 id="chartTitle">حركة السعر</h3><p>بيانات توضيحية للاتجاه مبنية على آخر سعر مُدخل</p></div>
+        <div class="chiprow">
+          <button class="chip" data-r="30" onclick="setRange(30,this)">30ي</button>
+          <button class="chip on" data-r="90" onclick="setRange(90,this)">90ي</button>
+          <button class="chip" data-r="200" onclick="setRange(200,this)">200ي</button>
+        </div>
+      </div>
+      <div style="height:320px"><canvas id="mainChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>مصادر الأسعار</h3><p>مباشر من إدخالك</p></div>
+      <div id="bankList"></div>
+      <div class="grid g2" style="margin-top:10px">
+        <div class="result-box"><p class="n" id="dHi">--</p><p class="l">أعلى (النطاق)</p></div>
+        <div class="result-box"><p class="n" id="dLo">--</p><p class="l">أدنى (النطاق)</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <div class="card-h"><h3>مناطق الدعم والمقاومة</h3><p>Pivot Points - أساس اتخاذ قرار الشراء/البيع</p></div>
+      <div class="ladder" id="ladderQuick"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>نقاط تنفيذ مقترحة</h3><p>تعتمد على نطاق التذبذب اليومي (ATR)</p></div>
+      <div class="grid g2">
+        <div style="background:var(--good-bg);border:1px solid color-mix(in srgb,var(--good) 30%,transparent);border-radius:var(--radius-sm);padding:12px"><p style="font-size:10.5px;color:var(--good);font-weight:800">▲ منطقة شراء مفضّلة</p><p class="stat-num" id="dBuyZone">--</p></div>
+        <div style="background:var(--bad-bg);border:1px solid color-mix(in srgb,var(--bad) 30%,transparent);border-radius:var(--radius-sm);padding:12px"><p style="font-size:10.5px;color:var(--bad);font-weight:800">▼ منطقة بيع مفضّلة</p><p class="stat-num" id="dSellZone">--</p></div>
+      </div>
+      <div class="rowline"><span class="k">التذبذب اليومي (ATR)</span><span class="v" id="dAtr">--</span></div>
+      <div class="rowline"><span class="k">نسبة التقلب</span><span class="v" id="dVol">--</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ التحليل الفني ============ -->
+<section id="p-tech" class="tp">
+  <div class="card" style="margin-bottom:12px;border-inline-start:4px solid var(--accent)">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div><h3 style="font-size:16px" id="techTitle">--</h3><p class="stat-sub" style="margin-top:4px">السعر المرجعي: <b id="techPrice" style="color:var(--text)">--</b></p></div>
+      <div style="display:flex;gap:8px">
+        <span class="badge" id="techBadgeShort">--</span>
+        <span class="badge" id="techBadgeLong">--</span>
+      </div>
+    </div>
+  </div>
+  <div class="grid g2" style="margin-bottom:12px">
+    <div class="card">
+      <div class="card-h"><h3>المتوسطات المتحركة</h3><p>SMA و EMA</p></div>
+      <div id="maList"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>مؤشر القوة النسبية RSI (14)</h3></div>
+      <p class="stat-num" id="rsiVal" style="text-align:center;font-size:32px">--</p>
+      <div class="meter"><i id="rsiMark" style="right:50%"></i></div>
+      <div class="meter-lbls"><span>0 تشبع بيعي</span><span>50</span><span>100 تشبع شرائي</span></div>
+      <p class="stat-sub" id="rsiNote" style="margin-top:8px"></p>
+    </div>
+  </div>
+  <div class="grid g2" style="margin-bottom:12px">
+    <div class="card">
+      <div class="card-h"><h3>MACD (12,26,9)</h3></div>
+      <div class="grid g3" style="margin-bottom:8px">
+        <div class="result-box"><p class="n" id="macdLine">--</p><p class="l">خط MACD</p></div>
+        <div class="result-box"><p class="n" id="macdSig">--</p><p class="l">خط الإشارة</p></div>
+        <div class="result-box"><p class="n" id="macdHist">--</p><p class="l">الهيستوجرام</p></div>
+      </div>
+      <div class="hbars" id="macdBars"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>مذبذب الاستوكاستك</h3><p>Stochastic (14,3)</p></div>
+      <div class="grid g2" style="margin-bottom:8px">
+        <div class="result-box"><p class="n" id="stochK">--</p><p class="l">%K</p></div>
+        <div class="result-box"><p class="n" id="stochD">--</p><p class="l">%D</p></div>
+      </div>
+      <div class="meter"><i id="stochMark" style="right:50%"></i></div>
+      <div class="meter-lbls"><span>تشبع بيعي</span><span>50</span><span>تشبع شرائي</span></div>
+    </div>
+  </div>
+  <div class="grid g2" style="margin-bottom:12px">
+    <div class="card">
+      <div class="card-h"><h3>حزم بولينجر</h3><p>Bollinger Bands (20,2)</p></div>
+      <div class="rowline"><span class="k">الحد العلوي</span><span class="v" id="bbU">--</span></div>
+      <div class="rowline"><span class="k">المتوسط</span><span class="v" id="bbM">--</span></div>
+      <div class="rowline"><span class="k">الحد السفلي</span><span class="v" id="bbL">--</span></div>
+      <p class="stat-sub" id="bbNote" style="margin-top:8px"></p>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>مستويات فيبوناتشي</h3><p>ارتداد على مدى النطاق المختار</p></div>
+      <div id="fibList"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-h"><h3>جدول الدعم والمقاومة الكامل</h3><p>Pivot Points: PP وثلاث مستويات دعم/مقاومة</p></div>
+    <div class="ladder" id="ladderFull"></div>
+  </div>
+</section>
+
+<!-- ============ روبوت التوقعات ============ -->
+<section id="p-bot" class="tp">
+  <div class="notice" style="margin-top:0">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;color:var(--info)"><rect x="5" y="9" width="14" height="10" rx="2.5"/><path d="M12 9V5.5"/><circle cx="12" cy="4" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="14" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="14" r="1.3" fill="currentColor" stroke="none"/><path d="M9 17.5h6"/></svg>
+    <div><b>عن الروبوت:</b> نموذج إحصائي تعليمي يمزج بين اتجاه الأسعار (الانحدار الخطي)، وقوة الزخم (RSI/MACD)، والتذبذب التاريخي (ATR) لتقدير نطاق سعري محتمل لكل فترة. <b>هذا ليس تنبؤاً مضموناً ولا اتصالاً ببيانات سوق حية</b>، بل تقدير حسابي بحت يجب مقارنته دوماً بالسعر الفعلي من مصدر رسمي قبل أي قرار.</div>
+  </div>
+  <div class="grid g3" id="forecastCards" style="margin-bottom:14px"></div>
+  <div class="card">
+    <div class="card-h"><h3>مخروط التوقع</h3><p id="botChartSub">السعر التاريخي ثم النطاق المتوقع للأيام القادمة</p></div>
+    <div style="height:300px"><canvas id="botChart"></canvas></div>
+  </div>
+</section>
+
+<!-- ============ إدارة المخاطر ============ -->
+<section id="p-risk" class="tp">
+  <div class="grid gmain" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-h"><h3>حاسبة حجم الصفقة الآمن</h3><p>لا تخاطر بأكثر مما تتحمل خسارته</p></div>
+      <div class="grid g2" style="margin-bottom:10px">
+        <div class="field"><label>رأس المال المتاح (جنيه)</label><input type="number" id="rCap" value="100000" min="0" oninput="calcRisk()"></div>
+        <div class="field"><label>نسبة المخاطرة لكل عملية (%)</label><input type="number" id="rPct" value="1.5" min="0.1" max="10" step="0.1" oninput="calcRisk()"></div>
+      </div>
+      <div class="grid g2" style="margin-bottom:12px">
+        <div class="field"><label>مسافة وقف الخسارة (%)</label><input type="number" id="rStop" value="1" min="0.1" max="10" step="0.1" oninput="calcRisk()"></div>
+        <div class="field"><label>نوع العملية</label><select id="rSide" onchange="calcRisk()"><option value="buy">شراء عملة أجنبية</option><option value="sell">بيع عملة أجنبية</option></select></div>
+      </div>
+      <div class="grid g3">
+        <div class="result-box"><p class="n" id="rMaxLoss">--</p><p class="l">أقصى خسارة مقبولة</p></div>
+        <div class="result-box"><p class="n" id="rSize">--</p><p class="l">حجم الصفقة الموصى به (جنيه)</p></div>
+        <div class="result-box"><p class="n" id="rSizeFx">--</p><p class="l">المعادل بالعملة</p></div>
+      </div>
+      <div class="rowline" style="margin-top:10px"><span class="k">مستوى وقف الخسارة المقترح</span><span class="v" id="rStopPx">--</span></div>
+      <div class="rowline"><span class="k">مستوى جني الأرباح المقترح (نسبة 1:1.5)</span><span class="v" id="rTpPx">--</span></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>لماذا هذه الأرقام؟</h3></div>
+      <p style="font-size:12px;color:var(--text-dim);line-height:1.9">حجم الصفقة = (رأس المال × نسبة المخاطرة) ÷ مسافة وقف الخسارة. هذه القاعدة تضمن أن أي خطأ في التوقيت لا يكلفك أكثر من النسبة التي حددتها من رأس مالك، بغض النظر عن حجم الصفقة نفسه.</p>
+      <div class="disc" style="margin-top:12px">هذه الأداة تعليمية وتقدم معلومات عامة لإدارة المخاطر، وليست استشارة مالية مرخصة. لأي قرار مالي كبير راجع مستشاراً مالياً مرخصاً أو موظف البنك مباشرة.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-h"><h3>عشر قواعد لحماية رأس مالك</h3><p>الانضباط أهم من دقة التوقع</p></div>
+    <div class="grid g3" id="rulesList"></div>
+  </div>
+</section>
+
+<!-- ============ محاكاة التحويل ============ -->
+<section id="p-sim" class="tp">
+  <div class="grid gmain">
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-h"><h3>تنفيذ عملية تحويل (محاكاة تعليمية)</h3></div>
+        <div class="grid g2" style="margin-bottom:10px">
+          <div class="field"><label>البنك المرجعي</label><select id="sBank" onchange="updSim()"><option value="banquemisr">بنك مصر</option><option value="aib">البنك العربي الدولي</option></select></div>
+          <div class="field"><label>العملية</label><select id="sType" onchange="updSim()"><option value="buy">شراء عملة أجنبية</option><option value="sell">بيع عملة أجنبية</option></select></div>
+        </div>
+        <div class="field" style="margin-bottom:10px"><label>المبلغ (جنيه مصري)</label><input type="number" id="sAmt" value="20000" min="100" step="100" oninput="updSim()"></div>
+        <div class="grid g2" style="margin-bottom:12px;background:var(--surface-2);border-radius:9px;padding:10px">
+          <div><p class="stat-sub">السعر المطبق</p><p class="stat-num" style="font-size:17px" id="sPx">--</p></div>
+          <div><p class="stat-sub">ستحصل على</p><p class="stat-num" style="font-size:17px;color:var(--gold)" id="sGet">--</p></div>
+        </div>
+        <div style="display:flex;gap:8px"><button class="btn btn-good" style="flex:1" onclick="execSim()">تنفيذ العملية</button></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h3>سجل العمليات</h3><button class="btn" onclick="clearLog()">مسح</button></div>
+        <div id="simLog"><p style="text-align:center;color:var(--text-faint);padding:20px;font-size:11.5px">لا توجد عمليات بعد</p></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>المحفظة التجريبية</h3></div>
+      <div class="grid g2" style="margin-bottom:8px">
+        <div class="result-box"><p class="n" id="wEGP">--</p><p class="l">جنيه مصري</p></div>
+        <div class="result-box"><p class="n" id="wFX">--</p><p class="l" id="wFXLbl">دولار</p></div>
+      </div>
+      <div class="result-box" style="margin-bottom:8px"><p class="n" id="wTotal">--</p><p class="l">إجمالي القيمة بالجنيه</p></div>
+      <div class="rowline"><span class="k">الربح / الخسارة</span><span class="v" id="wPnl">--</span></div>
+      <div class="field" style="margin-top:12px"><label>تعديل رأس المال (جنيه)</label><input type="number" id="wCapIn" placeholder="أدخل رقماً جديداً"></div>
+      <button class="btn" style="width:100%;margin-top:8px;justify-content:center" onclick="setCap()">تطبيق</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <div class="links">
+    <a href="https://www.banquemisr.com/Home/CAPITAL%20MARKETS/Exchange%20rates%20and%20currencies?sc_lang=ar-EG" target="_blank" rel="noopener">بنك مصر ↗</a>
+    <a href="https://ta3weem.com/en/banks/arab-international-bank-aib" target="_blank" rel="noopener">البنك العربي الدولي ↗</a>
+    <a href="https://www.cbe.org.eg/en/economic-research/statistics/cbe-exchange-rates" target="_blank" rel="noopener">البنك المركزي المصري ↗</a>
+  </div>
+  <div class="disc">
+    <b>إخلاء مسؤولية:</b> هذه اللوحة أداة مساعدة لتنظيم قرارات تحويل العملة الشخصية، ولا تمثل توصية استثمارية. الأسعار تأتي إما تلقائياً من مهمة الجلب المجدولة المرفقة (وقتها تُنسب صراحةً لمصدرها ووقت جلبها)، أو من آخر تحديث يدوي محفوظ - وفي الحالتين قد يفصلها دقائق أو ساعات عن اللحظة الفعلية. الرسوم البيانية والمؤشرات والتوقعات مبنية على نموذج حسابي توضيحي وليست بيانات سوق مسجلة. تحقق دائماً من السعر الفعلي مباشرة من البنك قبل تنفيذ أي تحويل، وراجع مستشاراً مالياً مرخصاً للقرارات الكبيرة.
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+document.documentElement.lang='ar';
+document.documentElement.dir='rtl';
+
+// ===================== الحالة والبيانات الأساسية =====================
+const SEED_DATE = '9 سبتمبر 2026';
+const SEED = {
+  USD:{ banquemisr:{buy:51.14, sell:51.24}, aib:{buy:51.14, sell:51.24} },
+  EUR:{ banquemisr:{buy:59.44, sell:59.69}, aib:{buy:59.45, sell:59.69} }
+};
+const BANKS = {
+  banquemisr:{name:'بنك مصر', color:'var(--bm)', note:'مباشر من نشرة banquemisr.com الرسمية'},
+  aib:{name:'البنك العربي الدولي', color:'var(--aib)', note:'عبر مجمّع أسعار ta3weem.com (موقع AIB لا ينشر جدولاً ثابتاً قابلاً للقراءة الآلية)'}
+};
+const CUR_META = { USD:{label:'الدولار الأمريكي', code:'USD'}, EUR:{label:'اليورو', code:'EUR'} };
+
+let RATES = {}, UPDATED_AT = {};
+let CUR = 'USD';
+let RANGE = 90;
+let H = {}; // تاريخ توضيحي لكل عملة
+let TS = null;
+let mainChart, botChart;
+let AUTO_STATUS = {ok:false, message:'جارٍ التحقق من ملف الأسعار التلقائي...'};
+
+// يحاول قراءة data/rates.json (يُحدَّثه GitHub Action مرفق بهذا المشروع كل ساعتين تقريباً
+// من نشرتي بنك مصر والبنك العربي الدولي). إن لم يوجد الملف أو تعذّرت قراءته لأي سبب
+// (لم تُفعَّل الأتمتة بعد، أو تعذّر الوصول للبنوك تلك اللحظة) تبقى اللوحة تعمل بآخر
+// سعر محفوظ محلياً أو بالقيم الافتراضية المزروعة، ولا يتعطل شيء.
+async function loadLiveRates(){
+  try{
+    const resp = await fetch('data/rates.json?_=' + Date.now(), {cache:'no-store'});
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const j = await resp.json();
+    if(!j || !j.USD || !j.EUR) throw new Error('shape غير متوقع');
+    let applied = 0;
+    ['USD','EUR'].forEach(cur=>{
+      const c = j[cur];
+      if(c && c.banquemisr && c.aib && c.banquemisr.buy>0 && c.banquemisr.sell>0 && c.aib.buy>0 && c.aib.sell>0){
+        RATES[cur] = { banquemisr:{buy:+c.banquemisr.buy, sell:+c.banquemisr.sell}, aib:{buy:+c.aib.buy, sell:+c.aib.sell} };
+        const dt = j.generatedAt ? new Date(j.generatedAt) : new Date();
+        UPDATED_AT[cur] = dt.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) + ' (تلقائي)';
+        applied++;
+      }
+    });
+    if(applied===0) throw new Error('لا توجد قيم صالحة في الملف');
+    saveRates();
+    const stale = j.generatedAt && (Date.now() - new Date(j.generatedAt).getTime()) > 1000*60*60*30;
+    AUTO_STATUS = { ok:true, message: stale ? 'آخر تحديث تلقائي قديم نسبياً (تحقق من تشغيل GitHub Action)' : 'الأسعار محدّثة تلقائياً من data/rates.json' , stale };
+  }catch(e){
+    AUTO_STATUS = { ok:false, message:'التحديث التلقائي غير مُفعّل أو تعذّر الوصول إليه الآن - يُعرض آخر سعر محفوظ أو مُدخل يدوياً', error:String(e.message||e) };
+  }
+}
+function renderAutoStatus(){
+  const el = document.getElementById('autoStatus');
+  if(!el) return;
+  el.textContent = AUTO_STATUS.message;
+  el.style.color = AUTO_STATUS.ok ? (AUTO_STATUS.stale ? 'var(--warn)' : 'var(--good)') : 'var(--text-faint)';
+}
+
+function ls_get(k, fallback){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
+function ls_set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+function loadState(){
+  RATES = ls_get('radar_rates', JSON.parse(JSON.stringify(SEED)));
+  UPDATED_AT = ls_get('radar_updated', {USD:SEED_DATE, EUR:SEED_DATE});
+  TS = ls_get('radar_wallet', {capEGP:100000, usd:0, eur:0, initEGP:100000, log:[]});
+}
+function saveRates(){ ls_set('radar_rates', RATES); ls_set('radar_updated', UPDATED_AT); }
+function saveWallet(){ ls_set('radar_wallet', TS); }
+
+const f2 = v => (Math.round(v*100)/100).toFixed(2);
+const f4 = v => (Math.round(v*10000)/10000).toFixed(4);
+const fnum = v => Math.round(v).toLocaleString('en-US');
+
+function mid(cur){
+  const r = RATES[cur];
+  const bmMid=(r.banquemisr.buy+r.banquemisr.sell)/2, aibMid=(r.aib.buy+r.aib.sell)/2;
+  return (bmMid+aibMid)/2;
+}
+function avgBuy(cur){ const r=RATES[cur]; return (r.banquemisr.buy+r.aib.buy)/2; }
+function avgSell(cur){ const r=RATES[cur]; return (r.banquemisr.sell+r.aib.sell)/2; }
+
+// ===================== توليد تاريخ توضيحي =====================
+function genHistory(cur){
+  const days=220;
+  const endPrice = mid(cur);
+  const startPrice = endPrice / (1 + (cur==='USD'?0.024:0.028)); // انجراف تاريخي تقريبي بسيط ينتهي عند السعر الحالي
+  const now = new Date();
+  let seedRand = cur==='USD'?11:29;
+  const rnd = () => { seedRand = (seedRand*9301+49297)%233280; return seedRand/233280; };
+  let noise=0;
+  const raw=[];
+  for(let i=days;i>=0;i--){
+    const d = new Date(now); d.setDate(d.getDate()-i);
+    const t = (days-i)/days;
+    const smooth = t*t*(3-2*t); // انحدار ناعم (smoothstep) بدل قفزة خطية حادة
+    const trendPrice = startPrice + (endPrice-startPrice)*smooth;
+    // تذبذب عائد للمتوسط (mean-reverting) بدل مسار عشوائي حر يمكن أن يبتعد كثيراً
+    noise = noise*0.85 + (rnd()-0.5)*(endPrice*0.0010);
+    noise = Math.max(-endPrice*0.0028, Math.min(endPrice*0.0028, noise));
+    let close = trendPrice + noise;
+    if(i===0) close = endPrice;
+    raw.push({date:d, wd:d.getDay(), close});
+  }
+  // نهاية الأسبوع (الجمعة والسبت) البنوك مغلقة - السعر يبقى كما هو
+  for(let i=1;i<raw.length;i++){ if(raw[i].wd===5||raw[i].wd===6) raw[i].close = raw[i-1].close; }
+  raw[raw.length-1].close = endPrice; // ضمان تطابق آخر سعر تماماً مع السعر المُدخل يدوياً
+  return raw.map(pt=>{
+    const dayVol = endPrice*0.0011;
+    const high = pt.close + dayVol*(0.4+rnd()*0.5);
+    const low = pt.close - dayVol*(0.4+rnd()*0.5);
+    return {date:pt.date, label:pt.date.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}), close:+pt.close.toFixed(4), high:+high.toFixed(4), low:+Math.max(low,0.01).toFixed(4)};
+  });
+}
+function rebuildHistory(){ H.USD = genHistory('USD'); H.EUR = genHistory('EUR'); }
+
+// ===================== المؤشرات الفنية =====================
+function sma(arr,p){ const s=arr.slice(-p); return s.reduce((a,b)=>a+b,0)/s.length; }
+function ema(arr,p){ const k=2/(p+1); let e=arr[0]; for(let i=1;i<arr.length;i++) e = arr[i]*k + e*(1-k); return e; }
+function rsi(arr,period=14){
+  if(arr.length<period+1) return 50;
+  let g=0,l=0;
+  for(let i=arr.length-period;i<arr.length;i++){ const d=arr[i]-arr[i-1]; if(d>0) g+=d; else l+=Math.abs(d); }
+  if(l===0) return 100;
+  return +(100-100/(1+g/l)).toFixed(1);
+}
+function macdCalc(arr){
+  const emaSeries=(p)=>{ const out=[]; const k=2/(p+1); let e=arr[0]; out.push(e); for(let i=1;i<arr.length;i++){ e=arr[i]*k+e*(1-k); out.push(e);} return out; };
+  const e12=emaSeries(12), e26=emaSeries(26);
+  const macdLine = e12.map((v,i)=>v-e26[i]);
+  const k=2/(9+1); let sig=macdLine[0]; const sigArr=[sig];
+  for(let i=1;i<macdLine.length;i++){ sig = macdLine[i]*k+sig*(1-k); sigArr.push(sig); }
+  const hist = macdLine.map((v,i)=>v-sigArr[i]);
+  return { line:macdLine[macdLine.length-1], signal:sigArr[sigArr.length-1], hist:hist[hist.length-1], histSeries:hist.slice(-20) };
+}
+function bollinger(arr,p=20){
+  const s=arr.slice(-p); const m=sma(arr,p);
+  const sd=Math.sqrt(s.reduce((a,v)=>a+(v-m)**2,0)/p);
+  return { u:+(m+2*sd).toFixed(4), m:+m.toFixed(4), l:+(m-2*sd).toFixed(4), sd };
+}
+function fibLevels(arr){
+  const h=Math.max(...arr), l=Math.min(...arr), d=h-l;
+  return [ {lb:'0.0%',v:h}, {lb:'23.6%',v:h-d*0.236}, {lb:'38.2%',v:h-d*0.382}, {lb:'50.0%',v:h-d*0.5}, {lb:'61.8%',v:h-d*0.618}, {lb:'78.6%',v:h-d*0.786}, {lb:'100%',v:l} ];
+}
+function atrCalc(hist,period=14){
+  const trs=[];
+  for(let i=1;i<hist.length;i++){
+    const h=hist[i].high, l=hist[i].low, pc=hist[i-1].close;
+    trs.push(Math.max(h-l, Math.abs(h-pc), Math.abs(l-pc)));
+  }
+  const s=trs.slice(-period);
+  return s.reduce((a,b)=>a+b,0)/s.length;
+}
+function stochCalc(hist,period=14,dPeriod=3){
+  const res=[];
+  for(let i=period-1;i<hist.length;i++){
+    const slice=hist.slice(i-period+1,i+1);
+    const hh=Math.max(...slice.map(d=>d.high)), ll=Math.min(...slice.map(d=>d.low));
+    const c=hist[i].close;
+    res.push(hh===ll?50:((c-ll)/(hh-ll))*100);
+  }
+  const k=res[res.length-1];
+  const dArr=res.slice(-dPeriod);
+  const d=dArr.reduce((a,b)=>a+b,0)/dArr.length;
+  return { k:+k.toFixed(1), d:+d.toFixed(1) };
+}
+function pivotPoints(hist){
+  const y = hist[hist.length-2], c = hist[hist.length-1].close;
+  const pp=(y.high+y.low+c)/3;
+  const r1=2*pp-y.low, s1=2*pp-y.high;
+  const r2=pp+(y.high-y.low), s2=pp-(y.high-y.low);
+  const r3=y.high+2*(pp-y.low), s3=y.low-2*(y.high-pp);
+  return {pp,r1,r2,r3,s1,s2,s3};
+}
+function linregSlope(arr){
+  const n=arr.length, xs=[...Array(n).keys()];
+  const xm=xs.reduce((a,b)=>a+b,0)/n, ym=arr.reduce((a,b)=>a+b,0)/n;
+  let num=0,den=0;
+  for(let i=0;i<n;i++){ num+=(xs[i]-xm)*(arr[i]-ym); den+=(xs[i]-xm)**2; }
+  return den===0?0:num/den;
+}
+
+function indicatorsFor(cur){
+  const hist = H[cur], closes = hist.map(d=>d.close);
+  return {
+    price: closes[closes.length-1],
+    sma5: sma(closes,5), sma10: sma(closes,10), sma20: sma(closes,20), sma50: sma(closes,50),
+    ema12: ema(closes.slice(-60),12), ema26: ema(closes.slice(-60),26),
+    rsi: rsi(closes,14),
+    macd: macdCalc(closes.slice(-90)),
+    bb: bollinger(closes,20),
+    fib: fibLevels(closes.slice(-Math.min(90,closes.length))),
+    atr: atrCalc(hist,14),
+    stoch: stochCalc(hist,14,3),
+    pivots: pivotPoints(hist),
+    slope20: linregSlope(closes.slice(-20))
+  };
+}
+
+function shortSignal(ind){
+  if(ind.rsi<30) return {t:'شراء قوي',c:'b-good'};
+  if(ind.rsi>70) return {t:'بيع قوي',c:'b-bad'};
+  if(ind.sma5>ind.sma10 && ind.macd.hist>0) return {t:'شراء',c:'b-good'};
+  if(ind.sma5<ind.sma10 && ind.macd.hist<0) return {t:'بيع',c:'b-bad'};
+  return {t:'محايد',c:'b-warn'};
+}
+function longSignal(ind){
+  if(ind.sma20>ind.sma50 && ind.price>ind.bb.m) return {t:'اتجاه صاعد',c:'b-good'};
+  if(ind.sma20<ind.sma50 && ind.price<ind.bb.m) return {t:'اتجاه هابط',c:'b-bad'};
+  return {t:'تذبذب جانبي',c:'b-warn'};
+}
+
+// ===================== الواجهة: التبويبات والعملة =====================
+function goTab(id,btn){
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('p-'+id).classList.add('on');
+  btn.classList.add('on');
+  if(id==='tech') renderTech();
+  if(id==='bot') renderBot();
+  if(id==='sim') updSim();
+}
+function setCur(c,btn){
+  CUR=c;
+  document.querySelectorAll('#curSeg button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('e_bm_buy').value=RATES[CUR].banquemisr.buy;
+  document.getElementById('e_bm_sell').value=RATES[CUR].banquemisr.sell;
+  document.getElementById('e_aib_buy').value=RATES[CUR].aib.buy;
+  document.getElementById('e_aib_sell').value=RATES[CUR].aib.sell;
+  renderAll();
+}
+function setRange(r,btn){ RANGE=r; document.querySelectorAll('.chiprow .chip').forEach(c=>c.classList.remove('on')); btn.classList.add('on'); drawMain(); }
+function toggleEdit(){ document.getElementById('editPanel').classList.toggle('on'); }
+function saveEdit(){
+  const bb=parseFloat(document.getElementById('e_bm_buy').value), bs=parseFloat(document.getElementById('e_bm_sell').value);
+  const ab=parseFloat(document.getElementById('e_aib_buy').value), as=parseFloat(document.getElementById('e_aib_sell').value);
+  if([bb,bs,ab,as].some(v=>isNaN(v)||v<=0)){ toast('rd','من فضلك أدخل أرقاماً صحيحة لكل الحقول'); return; }
+  RATES[CUR] = { banquemisr:{buy:bb,sell:bs}, aib:{buy:ab,sell:as} };
+  UPDATED_AT[CUR] = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  saveRates(); rebuildHistory(); toggleEdit(); renderAll();
+  toast('gn','تم تحديث الأسعار وإعادة حساب المؤشرات');
+}
+
+// ===================== الرسوم البيانية =====================
+function chartTheme(){
+  const cs=getComputedStyle(document.body);
+  return {
+    text: cs.getPropertyValue('--text-dim').trim(),
+    faint: cs.getPropertyValue('--text-faint').trim(),
+    grid: cs.getPropertyValue('--border').trim(),
+    surface: cs.getPropertyValue('--surface').trim(),
+    accent: cs.getPropertyValue('--accent').trim(),
+    good: cs.getPropertyValue('--good').trim(),
+    bad: cs.getPropertyValue('--bad').trim(),
+    bm: cs.getPropertyValue('--bm').trim(),
+    aib: cs.getPropertyValue('--aib').trim()
+  };
+}
+function baseScales(th){
+  return {
+    x:{ ticks:{color:th.faint,font:{family:'Tajawal',size:9.5},maxRotation:0,autoSkip:true,maxTicksLimit:8}, grid:{color:th.grid,display:false} },
+    y:{ ticks:{color:th.faint,font:{family:'Tajawal',size:9.5},callback:v=>v.toFixed(2)}, grid:{color:th.grid} }
+  };
+}
+function initCharts(){
+  const th=chartTheme();
+  const tt={ backgroundColor:th.surface, borderColor:th.grid, borderWidth:1, titleFont:{family:'Cairo',size:11,weight:'700'}, bodyFont:{family:'Tajawal',size:10.5}, titleColor:th.text, bodyColor:th.faint, padding:9, cornerRadius:8, displayColors:true };
+  mainChart = new Chart(document.getElementById('mainChart'),{ type:'line', data:{labels:[],datasets:[]}, options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, plugins:{ legend:{position:'top',align:'start',labels:{color:th.text,font:{family:'Tajawal',size:10.5},usePointStyle:true,pointStyle:'circle',padding:14}}, tooltip:{...tt, callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(4)}} }, scales: baseScales(th) } });
+  botChart = new Chart(document.getElementById('botChart'),{ type:'line', data:{labels:[],datasets:[]}, options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, plugins:{ legend:{position:'top',align:'start',labels:{color:th.text,font:{family:'Tajawal',size:10.5},usePointStyle:true,pointStyle:'circle',padding:14}}, tooltip:{...tt} }, scales: baseScales(th) } });
+}
+function drawMain(){
+  const th=chartTheme();
+  const hist=H[CUR].slice(-RANGE);
+  const closes=hist.map(d=>d.close);
+  const sma20series = hist.map((d,i,arr)=>{ const s=arr.slice(Math.max(0,i-19),i+1).map(x=>x.close); return s.length>=5? s.reduce((a,b)=>a+b,0)/s.length : null; });
+  mainChart.data.labels = hist.map(d=>d.label);
+  mainChart.data.datasets = [
+    {label:'متوسط السعر', data:closes, borderColor:th.accent, backgroundColor:th.accent+'22', borderWidth:2.5, pointRadius:0, pointHoverRadius:5, tension:.25, fill:true},
+    {label:'SMA 20', data:sma20series, borderColor:th.faint, borderWidth:1.5, borderDash:[5,4], pointRadius:0, tension:.25, fill:false}
+  ];
+  mainChart.update('none');
+  document.getElementById('dHi').textContent = f2(Math.max(...closes));
+  document.getElementById('dLo').textContent = f2(Math.min(...closes));
+}
+
+// ===================== لوحة التحكم =====================
+function renderBankList(){
+  let h='';
+  Object.keys(BANKS).forEach(k=>{
+    const b=BANKS[k], r=RATES[CUR][k];
+    h += `<div class="bankrow"><div class="bank-id"><div class="bank-sw" style="background:${b.color}"></div><div><p class="bank-name">${b.name}</p><p class="bank-sub">شراء ${f2(r.buy)} · بيع ${f2(r.sell)}</p><p class="bank-sub" style="opacity:.75">${b.note}</p></div></div><div class="bank-px"><b>${f2(r.sell)}</b><p class="spread-pill">جنيه للبيع</p></div></div>`;
+  });
+  document.getElementById('bankList').innerHTML = h;
+}
+function renderLadder(elId, piv, price){
+  const rows=[
+    {lb:'مقاومة 3',v:piv.r3,cls:'res'},{lb:'مقاومة 2',v:piv.r2,cls:'res'},{lb:'مقاومة 1',v:piv.r1,cls:'res'},
+    {lb:'نقطة الارتكاز',v:piv.pp,cls:'pp'},
+    {lb:'دعم 1',v:piv.s1,cls:'sup'},{lb:'دعم 2',v:piv.s2,cls:'sup'},{lb:'دعم 3',v:piv.s3,cls:'sup'}
+  ];
+  rows.push({lb:'⟵ السعر الحالي',v:price,cls:'now'});
+  rows.sort((a,b)=>b.v-a.v);
+  document.getElementById(elId).innerHTML = rows.map(r=>`<div class="ladder-row ${r.cls}"><span>${r.lb}</span><b>${f2(r.v)}</b></div>`).join('');
+}
+function renderAll(){
+  const ind = indicatorsFor(CUR);
+  document.getElementById('updWhen').textContent = UPDATED_AT[CUR] + ' · ' + CUR_META[CUR].label;
+  document.getElementById('dBuy').textContent = f2(avgBuy(CUR));
+  document.getElementById('dBuyC').textContent = 'بنك مصر '+f2(RATES[CUR].banquemisr.buy)+' · العربي الدولي '+f2(RATES[CUR].aib.buy);
+  document.getElementById('dSell').textContent = f2(avgSell(CUR));
+  document.getElementById('dSellC').textContent = 'بنك مصر '+f2(RATES[CUR].banquemisr.sell)+' · العربي الدولي '+f2(RATES[CUR].aib.sell);
+  const spread = avgSell(CUR)-avgBuy(CUR);
+  document.getElementById('dSpread').textContent = f2(spread);
+  document.getElementById('dSpreadP').textContent = 'هامش تحويل نحو '+(spread/avgBuy(CUR)*100).toFixed(2)+'%';
+
+  const sS = shortSignal(ind), sL = longSignal(ind);
+  document.getElementById('dSigShort').innerHTML = `<span class="badge ${sS.c}">${sS.t}</span>`;
+  document.getElementById('dSigLong').innerHTML = `<span class="badge ${sL.c}" style="padding:2px 9px;font-size:10.5px">${sL.t}</span>`;
+
+  document.getElementById('chartTitle').textContent = 'حركة سعر '+CUR_META[CUR].label;
+  renderBankList();
+  drawMain();
+  renderLadder('ladderQuick', ind.pivots, ind.price);
+
+  document.getElementById('dBuyZone').textContent = f2(ind.pivots.s1);
+  document.getElementById('dSellZone').textContent = f2(ind.pivots.r1);
+  document.getElementById('dAtr').textContent = f4(ind.atr)+' جنيه/يوم';
+  document.getElementById('dVol').textContent = (ind.atr/ind.price*100).toFixed(2)+'%';
+
+  if(document.getElementById('p-tech').classList.contains('on')) renderTech();
+  if(document.getElementById('p-bot').classList.contains('on')) renderBot();
+  if(document.getElementById('p-sim').classList.contains('on')) updSim();
+}
+
+// ===================== التحليل الفني =====================
+function maRow(lb,v,price){
+  const d=price-v, up=d>=0;
+  return `<div class="rowline"><span class="k">${lb}</span><span class="v">${f2(v)} <span class="chg ${up?'up':'dn'}" style="font-size:10px;margin-inline-start:6px">${up?'▲':'▼'} ${up?'+':''}${f4(d)}</span></span></div>`;
+}
+function fibRow(lb,v,price){
+  const near = Math.abs(price-v) < price*0.0025;
+  return `<div class="rowline" style="${near?'background:var(--warn-bg);border-radius:6px;padding-inline:8px':''}"><span class="k" style="${near?'color:var(--warn);font-weight:800':''}">${lb}</span><span class="v" style="${near?'color:var(--warn)':''}">${f2(v)}${near?' ← قريب من السعر':''}</span></div>`;
+}
+function renderTech(){
+  const ind = indicatorsFor(CUR);
+  document.getElementById('techTitle').textContent = 'التحليل الفني الكامل - '+CUR_META[CUR].label;
+  document.getElementById('techPrice').textContent = f2(ind.price)+' جنيه';
+  const sS=shortSignal(ind), sL=longSignal(ind);
+  document.getElementById('techBadgeShort').className='badge '+sS.c;
+  document.getElementById('techBadgeShort').textContent='قصير المدى: '+sS.t;
+  document.getElementById('techBadgeLong').className='badge '+sL.c;
+  document.getElementById('techBadgeLong').textContent='طويل المدى: '+sL.t;
+
+  document.getElementById('maList').innerHTML =
+    maRow('SMA 5', ind.sma5, ind.price)+maRow('SMA 10', ind.sma10, ind.price)+
+    maRow('SMA 20', ind.sma20, ind.price)+maRow('SMA 50', ind.sma50, ind.price)+
+    maRow('EMA 12', ind.ema12, ind.price)+maRow('EMA 26', ind.ema26, ind.price);
+
+  document.getElementById('rsiVal').textContent = ind.rsi;
+  document.getElementById('rsiVal').style.color = ind.rsi<30?'var(--good)':ind.rsi>70?'var(--bad)':'var(--warn)';
+  document.getElementById('rsiMark').style.right = (100-ind.rsi)+'%';
+  document.getElementById('rsiNote').textContent = ind.rsi<30?'تشبع بيعي - قد تكون فرصة شراء':ind.rsi>70?'تشبع شرائي - قد تكون فرصة بيع':'منطقة محايدة، لا إشارة قوية';
+
+  document.getElementById('macdLine').textContent = f4(ind.macd.line);
+  document.getElementById('macdSig').textContent = f4(ind.macd.signal);
+  const he=document.getElementById('macdHist'); he.textContent=f4(ind.macd.hist); he.style.color = ind.macd.hist>=0?'var(--good)':'var(--bad)';
+  const maxAbs = Math.max(...ind.macd.histSeries.map(v=>Math.abs(v)),0.0001);
+  document.getElementById('macdBars').innerHTML = ind.macd.histSeries.map(v=>`<i style="height:${Math.max(6,Math.abs(v)/maxAbs*38)}px;background:${v>=0?'var(--good)':'var(--bad)'}"></i>`).join('');
+
+  document.getElementById('stochK').textContent = ind.stoch.k;
+  document.getElementById('stochD').textContent = ind.stoch.d;
+  document.getElementById('stochMark').style.right = (100-ind.stoch.k)+'%';
+
+  document.getElementById('bbU').textContent = f2(ind.bb.u);
+  document.getElementById('bbM').textContent = f2(ind.bb.m);
+  document.getElementById('bbL').textContent = f2(ind.bb.l);
+  document.getElementById('bbNote').textContent = ind.price>ind.bb.u ? 'السعر فوق الحد العلوي - زخم شرائي قوي' : ind.price<ind.bb.l ? 'السعر تحت الحد السفلي - زخم بيعي قوي' : 'السعر داخل النطاق الطبيعي للتذبذب';
+
+  document.getElementById('fibList').innerHTML = ind.fib.map(l=>fibRow(l.lb, l.v, ind.price)).join('');
+  renderLadder('ladderFull', ind.pivots, ind.price);
+}
+
+// ===================== روبوت التوقعات =====================
+const TIMEFRAMES = [
+  {key:'eod', label:'نهاية اليوم', days:0.5},
+  {key:'3d', label:'خلال 3 أيام', days:3},
+  {key:'1w', label:'خلال أسبوع', days:7},
+  {key:'2w', label:'خلال أسبوعين', days:14},
+  {key:'1m', label:'خلال شهر', days:30}
+];
+function forecastFor(cur, days){
+  const ind = indicatorsFor(cur);
+  const drift = ind.slope20*days;
+  const band = ind.atr*Math.sqrt(Math.max(days,0.5))*1.25;
+  const center = ind.price+drift;
+  const lo = center-band, hi = center+band;
+  let agree=0;
+  const dirUp = drift>=0;
+  if((dirUp && ind.macd.hist>0)||(!dirUp && ind.macd.hist<0)) agree++;
+  if((dirUp && ind.rsi>=50)||(!dirUp && ind.rsi<50)) agree++;
+  if((dirUp && ind.price>=ind.bb.m)||(!dirUp && ind.price<ind.bb.m)) agree++;
+  if(Math.abs(drift) > ind.atr*0.35) agree++;
+  const confPct = Math.round(28 + (agree/4)*58);
+  const label = Math.abs(drift) < ind.atr*0.2 ? 'استقرار نسبي' : (dirUp ? 'ميل صعودي' : 'ميل هبوطي');
+  const cls = Math.abs(drift) < ind.atr*0.2 ? 'b-warn' : (dirUp ? 'b-bad' : 'b-good'); // صعود سعر الدولار = تكلفة أعلى (تحذيري)، هبوطه إيجابي للراغبين بالشراء لاحقاً
+  return {lo,center,hi,confPct,label,cls,drift};
+}
+function renderBot(){
+  document.getElementById('botChartSub').textContent = 'توقعات '+CUR_META[CUR].label+' - نموذج إحصائي تعليمي غير مضمون';
+  let cardsHtml='';
+  TIMEFRAMES.forEach(tf=>{
+    const r = forecastFor(CUR, tf.days);
+    const confColor = r.confPct>=65?'var(--good)':r.confPct>=45?'var(--warn)':'var(--bad)';
+    cardsHtml += `<div class="tf-card">
+      <div class="tf-h"><span>${tf.label}</span><span class="badge ${r.cls}" style="font-size:9.5px;padding:2px 8px">${r.label}</span></div>
+      <p class="tf-range">${f2(r.lo)} – ${f2(r.hi)}</p>
+      <p class="stat-sub">وسط التقدير: ${f2(r.center)} جنيه</p>
+      <div class="conf-bar"><div class="conf-fill" style="width:${r.confPct}%;background:${confColor}"></div></div>
+      <p class="stat-sub" style="margin-top:4px">درجة اتساق المؤشرات: ${r.confPct}%</p>
+    </div>`;
+  });
+  document.getElementById('forecastCards').innerHTML = cardsHtml;
+
+  const th=chartTheme();
+  const hist = H[CUR].slice(-60);
+  const closes = hist.map(d=>d.close);
+  const labels = hist.map(d=>d.label);
+  const projDays=[3,7,14,30];
+  const lastDate = hist[hist.length-1].date;
+  projDays.forEach(d=>{ const nd=new Date(lastDate); nd.setDate(nd.getDate()+d); labels.push(nd.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})); });
+
+  const histLine = [...closes, ...projDays.map(()=>null)];
+  const hiLine = [...closes.map(()=>null)]; hiLine[closes.length-1]=closes[closes.length-1];
+  const loLine = [...closes.map(()=>null)]; loLine[closes.length-1]=closes[closes.length-1];
+  const midLine = [...closes.map(()=>null)]; midLine[closes.length-1]=closes[closes.length-1];
+  projDays.forEach(d=>{ const r=forecastFor(CUR,d); hiLine.push(r.hi); loLine.push(r.lo); midLine.push(r.center); });
+
+  botChart.data.labels = labels;
+  botChart.data.datasets = [
+    {label:'السعر الفعلي (تاريخي)', data:histLine, borderColor:th.accent, backgroundColor:th.accent+'20', borderWidth:2.5, pointRadius:0, tension:.25, fill:true},
+    {label:'الحد الأعلى المتوقع', data:hiLine, borderColor:th.bad+'99', borderWidth:1.5, borderDash:[5,4], pointRadius:0, tension:.2, fill:false},
+    {label:'التقدير الأوسط', data:midLine, borderColor:th.faint, borderWidth:1.5, pointRadius:0, tension:.2, fill:false},
+    {label:'الحد الأدنى المتوقع', data:loLine, borderColor:th.good+'99', borderWidth:1.5, borderDash:[5,4], pointRadius:0, tension:.2, fill:'-3'}
+  ];
+  botChart.update('none');
+}
+
+// ===================== إدارة المخاطر =====================
+function calcRisk(){
+  const ind = indicatorsFor(CUR);
+  const cap = parseFloat(document.getElementById('rCap').value)||0;
+  const riskPct = parseFloat(document.getElementById('rPct').value)||0;
+  const stopPct = parseFloat(document.getElementById('rStop').value)||0.1;
+  const side = document.getElementById('rSide').value;
+  const maxLoss = cap*riskPct/100;
+  const size = stopPct>0 ? maxLoss/(stopPct/100) : 0;
+  const price = side==='buy'? avgSell(CUR) : avgBuy(CUR);
+  const fxAmt = size/price;
+  const stopPx = side==='buy' ? price*(1-stopPct/100) : price*(1+stopPct/100);
+  const tpPx = side==='buy' ? price*(1+ (stopPct*1.5)/100) : price*(1-(stopPct*1.5)/100);
+  document.getElementById('rMaxLoss').textContent = fnum(maxLoss)+' ج.م';
+  document.getElementById('rSize').textContent = fnum(Math.min(size,cap))+' ج.م';
+  document.getElementById('rSizeFx').textContent = fxAmt.toFixed(2)+' '+CUR;
+  document.getElementById('rStopPx').textContent = f2(stopPx)+' جنيه';
+  document.getElementById('rTpPx').textContent = f2(tpPx)+' جنيه';
+}
+const RULES = [
+  {t:'لا تتجاوز 1-2% لكل عملية', d:'لا تخاطر بأكثر من هذه النسبة من رأس مالك في تحويل واحد، مهما بدا السعر مغرياً.'},
+  {t:'حدد وقف الخسارة مسبقاً', d:'اتخذ قرار الخروج قبل الدخول، ولا تنتظر ردة فعل عاطفية أثناء الخسارة.'},
+  {t:'نوّع بين العملات', d:'لا تضع كل مدخراتك بعملة واحدة، وزّع بين الجنيه والدولار واليورو حسب احتياجك الفعلي.'},
+  {t:'قارن بين مصدرين رسميين', d:'راجع سعر أكثر من بنك (بنك مصر، العربي الدولي) قبل تحويل مبالغ كبيرة.'},
+  {t:'تجنب الأسواق غير المرخصة', d:'التعامل خارج القنوات المصرفية الرسمية يحمّلك مخاطر قانونية وتشغيلية حقيقية.'},
+  {t:'سجّل كل عملياتك', d:'احتفظ بسجل للتحويلات والأسعار لتقييم قراراتك بموضوعية لاحقاً.'},
+  {t:'افصل العاطفة عن القرار', d:'تقلب بسيط في يوم واحد لا يستحق تغيير خطتك المالية طويلة المدى.'},
+  {t:'افصل أموال الطوارئ', d:'لا تُدخل مدخرات الطوارئ أو الالتزامات الأساسية ضمن أي عملية مخاطرة.'},
+  {t:'حدد أفقك الزمني', d:'احتياج قصير المدى (سفر، استيراد) يختلف تماماً عن ادخار طويل المدى.'},
+  {t:'استشر جهة مرخصة للقرارات الكبيرة', d:'هذه الأداة تعليمية، وليست بديلاً عن مستشار مالي مرخّص لقرارات كبيرة.'}
+];
+function renderRules(){
+  document.getElementById('rulesList').innerHTML = RULES.map((r,idx)=>`<div class="rule"><span class="rule-num">${String(idx+1).padStart(2,'0')}</span><div><b>${r.t}</b><p>${r.d}</p></div></div>`).join('');
+}
+
+// ===================== محاكاة التحويل =====================
+function updSim(){
+  const bank=document.getElementById('sBank').value, type=document.getElementById('sType').value;
+  const r=RATES[CUR][bank];
+  const px = type==='buy'? r.sell : r.buy;
+  document.getElementById('sPx').textContent = f2(px)+' جنيه';
+  const amt=parseFloat(document.getElementById('sAmt').value)||0;
+  document.getElementById('sGet').textContent = (amt/px).toFixed(2)+' '+CUR;
+  renderWallet(); renderSimLog();
+  document.getElementById('wFXLbl').textContent = CUR_META[CUR].label;
+}
+function execSim(){
+  const bank=document.getElementById('sBank').value, type=document.getElementById('sType').value;
+  const r=RATES[CUR][bank];
+  const amt=parseFloat(document.getElementById('sAmt').value);
+  if(isNaN(amt)||amt<=0){ toast('bl','أدخل مبلغاً صحيحاً'); return; }
+  const fxKey = CUR.toLowerCase();
+  if(type==='buy'){
+    const px=r.sell;
+    if(amt>TS.capEGP){ toast('rd','رصيد الجنيه غير كافٍ'); return; }
+    const got=amt/px;
+    TS.capEGP-=amt; TS[fxKey]=(TS[fxKey]||0)+got;
+    TS.log.unshift({type:'buy',cur:CUR,bank,px,egp:amt,fx:+got.toFixed(2),time:new Date().toLocaleTimeString('en-GB')});
+    toast('gn','تم شراء '+got.toFixed(2)+' '+CUR+' عند '+f2(px));
+  } else {
+    const px=r.buy;
+    const have=TS[fxKey]||0;
+    if(have<=0){ toast('rd','لا يوجد رصيد من هذه العملة'); return; }
+    const sellAmt = Math.min(have, amt/px);
+    const got = sellAmt*px;
+    TS.capEGP+=got; TS[fxKey]=have-sellAmt;
+    TS.log.unshift({type:'sell',cur:CUR,bank,px,egp:got,fx:+sellAmt.toFixed(2),time:new Date().toLocaleTimeString('en-GB')});
+    toast('rd','تم بيع '+sellAmt.toFixed(2)+' '+CUR+' عند '+f2(px));
+  }
+  saveWallet(); updSim();
+}
+function renderWallet(){
+  const usdVal=(TS.usd||0)*mid('USD'), eurVal=(TS.eur||0)*mid('EUR');
+  const total=TS.capEGP+usdVal+eurVal;
+  const pnl=total-TS.initEGP, pp=TS.initEGP? pnl/TS.initEGP*100 : 0;
+  document.getElementById('wEGP').textContent = fnum(TS.capEGP);
+  document.getElementById('wFX').textContent = (TS[CUR.toLowerCase()]||0).toFixed(2);
+  document.getElementById('wTotal').textContent = fnum(total);
+  const pe=document.getElementById('wPnl');
+  pe.textContent = (pnl>=0?'+':'')+fnum(pnl)+' ج.م ('+(pp>=0?'+':'')+pp.toFixed(2)+'%)';
+  pe.style.color = pnl>=0?'var(--good)':'var(--bad)';
+}
+function renderSimLog(){
+  const el=document.getElementById('simLog');
+  if(!TS.log.length){ el.innerHTML='<p style="text-align:center;color:var(--text-faint);padding:20px;font-size:11.5px">لا توجد عمليات بعد</p>'; return; }
+  el.innerHTML = TS.log.slice(0,25).map(t=>{
+    const bn=BANKS[t.bank].name;
+    return `<div class="le ${t.type}"><div style="display:flex;justify-content:space-between"><b>${t.type==='buy'?'شراء':'بيع'} ${t.cur} · ${bn}</b><span style="color:var(--text-faint)">${t.time}</span></div><div style="display:flex;justify-content:space-between;margin-top:3px;color:var(--text-dim)"><span>${t.fx.toFixed(2)} ${t.cur} @ ${f2(t.px)}</span><span>${fnum(t.egp)} ج.م</span></div></div>`;
+  }).join('');
+}
+function clearLog(){ TS.log=[]; saveWallet(); renderSimLog(); }
+function setCap(){
+  const v=parseFloat(document.getElementById('wCapIn').value);
+  if(!isNaN(v)&&v>0){ TS.capEGP=v; TS.initEGP=v; TS.usd=0; TS.eur=0; saveWallet(); updSim(); toast('bl','تم تحديث رأس المال'); }
+}
+
+// ===================== أدوات عامة =====================
+let toastTimer;
+function toast(type,msg){
+  const t=document.getElementById('toast');
+  t.className='toast '+type;
+  const sym = type==='gn'?'✓':type==='rd'?'✕':'ℹ';
+  t.innerHTML = `<span style="margin-inline-end:7px;font-weight:900">${sym}</span>${msg}`;
+  clearTimeout(toastTimer);
+  requestAnimationFrame(()=>t.classList.add('sh'));
+  toastTimer=setTimeout(()=>t.classList.remove('sh'),3800);
+}
+function doRefresh(){
+  const i=document.getElementById('refIco');
+  i.style.transition='transform .5s ease'; i.style.transform='rotate(360deg)';
+  setTimeout(()=>{ i.style.transform='rotate(0)'; },500);
+  renderAll();
+  toast('bl','تم إعادة حساب المؤشرات بناءً على آخر سعر مُدخل');
+}
+
+// ===================== التهيئة =====================
+async function init(){
+  loadState();
+  await loadLiveRates();
+  renderAutoStatus();
+  rebuildHistory();
+  initCharts();
+  renderRules();
+  document.getElementById('e_bm_buy').value=RATES[CUR].banquemisr.buy;
+  document.getElementById('e_bm_sell').value=RATES[CUR].banquemisr.sell;
+  document.getElementById('e_aib_buy').value=RATES[CUR].aib.buy;
+  document.getElementById('e_aib_sell').value=RATES[CUR].aib.sell;
+  renderAll();
+  calcRisk();
+  updSim();
+  const ck=()=>document.getElementById('clk').textContent=new Date().toLocaleTimeString('en-GB');
+  ck(); setInterval(ck,1000);
+  // إعادة محاولة التحديث التلقائي كل 15 دقيقة أثناء بقاء الصفحة مفتوحة
+  setInterval(async ()=>{ await loadLiveRates(); renderAutoStatus(); if(AUTO_STATUS.ok) renderAll(); }, 15*60*1000);
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
