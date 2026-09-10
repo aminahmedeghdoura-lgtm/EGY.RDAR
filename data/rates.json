@@ -1,13 +1,15 @@
 {
-  "generatedAt": "2026-09-10T17:42:37.395Z",
-  "ok": true,
-  "errors": [],
+  "generatedAt": "2026-09-10T20:52:58.845Z",
+  "ok": false,
+  "errors": [
+    "aib: https://ta3weem.com/en/banks/arab-international-bank-aib → HTTP 403 | https://banklive.net/en/currency-exchange-rates-in-arab-international-bank-aib → This operation was aborted"
+  ],
   "USD": {
     "banquemisr": {
       "buy": 51.27,
       "sell": 51.37,
       "source": "https://www.banquemisr.com/Home/CAPITAL%20MARKETS/Exchange%20rates%20and%20currencies?sc_lang=ar-EG",
-      "fetchedAt": "2026-09-10T17:42:34.209Z"
+      "fetchedAt": "2026-09-10T20:52:36.083Z"
     },
     "aib": {
       "buy": 51.27,
@@ -21,7 +23,7 @@
       "buy": 59.586,
       "sell": 59.7998,
       "source": "https://www.banquemisr.com/Home/CAPITAL%20MARKETS/Exchange%20rates%20and%20currencies?sc_lang=ar-EG",
-      "fetchedAt": "2026-09-10T17:42:34.209Z"
+      "fetchedAt": "2026-09-10T20:52:36.083Z"
     },
     "aib": {
       "buy": 59.5501,
