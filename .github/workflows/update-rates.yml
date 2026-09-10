@@ -1,0 +1,41 @@
+name: تحديث أسعار الصرف
+
+on:
+  schedule:
+    # كل ساعتين. الأوقات هنا بتوقيت UTC (توقيت القاهرة = UTC+2 أو +3 حسب التوقيت الصيفي).
+    - cron: '15 */2 * * *'
+  workflow_dispatch: {} # يسمح بتشغيل يدوي فوري من تبويب Actions في GitHub
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-rates
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: سحب المستودع
+        uses: actions/checkout@v4
+
+      - name: تجهيز Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: تشغيل سكربت الجلب
+        run: node scripts/scrape.mjs
+
+      - name: حفظ ونشر التغييرات إن وُجدت
+        run: |
+          git config user.name "radar-egp-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if git diff --quiet -- data/rates.json; then
+            echo "لا تغييرات في الأسعار."
+          else
+            git add data/rates.json
+            git commit -m "chore: تحديث تلقائي لأسعار الصرف"
+            git push
+          fi
