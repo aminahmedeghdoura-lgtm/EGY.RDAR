@@ -1,13 +1,35 @@
 {
-  "generatedAt": "2026-09-09T12:00:00.000Z",
-  "ok": true,
-  "errors": [],
+  "generatedAt": "2026-09-10T00:32:33.225Z",
+  "ok": false,
+  "errors": [
+    "aib: HTTP 403"
+  ],
   "USD": {
-    "banquemisr": { "buy": 51.14, "sell": 51.24, "source": "https://www.banquemisr.com/Home/CAPITAL%20MARKETS/Exchange%20rates%20and%20currencies?sc_lang=ar-EG", "fetchedAt": "2026-09-09T12:00:00.000Z" },
-    "aib": { "buy": 51.14, "sell": 51.24, "source": "https://ta3weem.com/en/banks/arab-international-bank-aib", "fetchedAt": "2026-09-09T12:00:00.000Z" }
+    "banquemisr": {
+      "buy": 51.14,
+      "sell": 51.24,
+      "source": "https://www.banquemisr.com/Home/CAPITAL%20MARKETS/Exchange%20rates%20and%20currencies?sc_lang=ar-EG",
+      "fetchedAt": "2026-09-10T00:32:30.887Z"
+    },
+    "aib": {
+      "buy": 51.14,
+      "sell": 51.24,
+      "source": "https://ta3weem.com/en/banks/arab-international-bank-aib",
+      "fetchedAt": "2026-09-09T12:00:00.000Z"
+    }
   },
   "EUR": {
-    "banquemisr": { "buy": 59.44, "sell": 59.69, "source": "https://www.banquemisr.com/Home/CAPITAL%20MARKETS/Exchange%20rates%20and%20currencies?sc_lang=ar-EG", "fetchedAt": "2026-09-09T12:00:00.000Z" },
-    "aib": { "buy": 59.45, "sell": 59.69, "source": "https://ta3weem.com/en/banks/arab-international-bank-aib", "fetchedAt": "2026-09-09T12:00:00.000Z" }
+    "banquemisr": {
+      "buy": 59.44,
+      "sell": 59.6895,
+      "source": "https://www.banquemisr.com/Home/CAPITAL%20MARKETS/Exchange%20rates%20and%20currencies?sc_lang=ar-EG",
+      "fetchedAt": "2026-09-10T00:32:30.887Z"
+    },
+    "aib": {
+      "buy": 59.45,
+      "sell": 59.69,
+      "source": "https://ta3weem.com/en/banks/arab-international-bank-aib",
+      "fetchedAt": "2026-09-09T12:00:00.000Z"
+    }
   }
 }
