@@ -22,22 +22,37 @@ import { existsSync } from 'node:fs';
 
 const OUT_PATH = new URL('../data/rates.json', import.meta.url);
 
+// كل مصدر الآن قائمة (وليس عنصراً واحداً) - يُجرَّب الأول، وإن فشل (حجب 403،
+// تغيّر هيكل الصفحة...) يُجرَّب التالي تلقائياً. بنك مصر له مصدر واحد رسمي؛
+// البنك العربي الدولي عبر مجمّعين مستقلّين (كلاهما مصدر بديل وليس موقع AIB
+// الرسمي - راجع الملاحظة أعلى الملف) لأن بعض مواقع التجميع تحجب الطلبات
+// القادمة من خوادم GitHub Actions السحابية.
 const SOURCES = {
-  banquemisr: {
-    url: 'https://www.banquemisr.com/Home/CAPITAL%20MARKETS/Exchange%20rates%20and%20currencies?sc_lang=ar-EG',
-    labels: {
-      USD: ['الدولار الأمريكى', 'الدولار الأمريكي', 'دولار أمريكي', 'USD'],
-      EUR: ['اليورو الأوروبى', 'اليورو الأوروبي', 'يورو أوروبي', 'يورو', 'EUR']
+  banquemisr: [
+    {
+      url: 'https://www.banquemisr.com/Home/CAPITAL%20MARKETS/Exchange%20rates%20and%20currencies?sc_lang=ar-EG',
+      labels: {
+        USD: ['الدولار الأمريكى', 'الدولار الأمريكي', 'دولار أمريكي', 'USD'],
+        EUR: ['اليورو الأوروبى', 'اليورو الأوروبي', 'يورو أوروبي', 'يورو', 'EUR']
+      }
     }
-  },
-  aib: {
-    // مصدر بديل (مجمّع) وليس موقع AIB الرسمي - راجع الملاحظة أعلى الملف.
-    url: 'https://ta3weem.com/en/banks/arab-international-bank-aib',
-    labels: {
-      USD: ['US Dollar', 'USD', 'دولار'],
-      EUR: ['Euro', 'EUR', 'يورو']
+  ],
+  aib: [
+    {
+      url: 'https://ta3weem.com/en/banks/arab-international-bank-aib',
+      labels: {
+        USD: ['US Dollar', 'USD', 'دولار'],
+        EUR: ['Euro', 'EUR', 'يورو']
+      }
+    },
+    {
+      url: 'https://banklive.net/en/currency-exchange-rates-in-arab-international-bank-aib',
+      labels: {
+        USD: ['Us Dollar', 'US Dollar', 'USDEGP', 'USD'],
+        EUR: ['Euro', 'EUREGP', 'EUR']
+      }
     }
-  }
+  ]
 };
 
 // نطاقات معقولة للتحقق من صحة الأرقام المُستخرجة (تحدّث هذه الحدود إذا تحرك
@@ -99,7 +114,7 @@ async function fetchText(url) {
   }
 }
 
-async function scrapeSource(key, cfg) {
+async function scrapeOne(cfg) {
   const result = { source: cfg.url, fetchedAt: new Date().toISOString(), ok: false, USD: null, EUR: null, error: null };
   try {
     const html = await fetchText(cfg.url);
@@ -112,6 +127,17 @@ async function scrapeSource(key, cfg) {
     result.error = String(e && e.message ? e.message : e);
   }
   return result;
+}
+
+// يجرّب كل مصدر في القائمة بالترتيب حتى ينجح أحدها، ويجمع كل الأخطاء لو فشلت كلها.
+async function scrapeSource(key, sourceList) {
+  const attempts = [];
+  for (const cfg of sourceList) {
+    const r = await scrapeOne(cfg);
+    attempts.push({ url: cfg.url, ok: r.ok, error: r.error });
+    if (r.ok) return { ...r, attempts };
+  }
+  return { source: sourceList[0]?.url, fetchedAt: new Date().toISOString(), ok: false, USD: null, EUR: null, error: attempts.map(a => `${a.url} → ${a.error}`).join(' | '), attempts };
 }
 
 async function loadPrevious() {
