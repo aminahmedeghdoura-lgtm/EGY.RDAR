@@ -32,10 +32,28 @@ jobs:
         run: |
           git config user.name "radar-egp-bot"
           git config user.email "actions@users.noreply.github.com"
+
           if git diff --quiet -- data/rates.json; then
             echo "لا تغييرات في الأسعار."
-          else
-            git add data/rates.json
-            git commit -m "chore: تحديث تلقائي لأسعار الصرف"
-            git push
+            exit 0
           fi
+
+          git add data/rates.json
+          git commit -m "chore: تحديث تلقائي لأسعار الصرف"
+
+          # قد يتقدّم الفرع البعيد (main) بينما هذا التشغيل يعمل - مثلاً إذا
+          # كنت تعدّل ملفاً في نفس اللحظة من محرر GitHub، أو تزامن تشغيلان.
+          # بدل أن يفشل الدفع فوراً، نعيد المزامنة (fetch + rebase) ونحاول
+          # عدة مرات قبل الاستسلام.
+          n=0
+          until git push; do
+            n=$((n + 1))
+            if [ "$n" -ge 5 ]; then
+              echo "فشل الدفع بعد ٥ محاولات - على الأرجح تعارض حقيقي في الملف."
+              exit 1
+            fi
+            echo "الفرع البعيد تحرك أثناء التشغيل، إعادة المزامنة والمحاولة ($n)..."
+            sleep $((n * 5))
+            git fetch origin main
+            git rebase origin/main
+          done
