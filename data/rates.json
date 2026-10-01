@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-01T13:16:10.616Z",
+  "generatedAt": "2026-10-01T19:32:03.870Z",
   "ok": true,
   "errors": [],
   "USD": {
@@ -7,13 +7,13 @@
       "buy": 52.27,
       "sell": 52.37,
       "source": "https://www.banquemisr.com/Home/CAPITAL%20MARKETS/Exchange%20rates%20and%20currencies?sc_lang=ar-EG",
-      "fetchedAt": "2026-10-01T13:16:06.342Z"
+      "fetchedAt": "2026-10-01T19:32:00.657Z"
     },
     "aib": {
       "buy": 52.27,
       "sell": 52.37,
       "source": "https://banklive.net/en/currency-exchange-rates-in-arab-international-bank-aib",
-      "fetchedAt": "2026-10-01T13:16:09.168Z"
+      "fetchedAt": "2026-10-01T19:32:02.913Z"
     }
   },
   "EUR": {
@@ -21,13 +21,13 @@
       "buy": 58.8874,
       "sell": 59.3666,
       "source": "https://www.banquemisr.com/Home/CAPITAL%20MARKETS/Exchange%20rates%20and%20currencies?sc_lang=ar-EG",
-      "fetchedAt": "2026-10-01T13:16:06.342Z"
+      "fetchedAt": "2026-10-01T19:32:00.657Z"
     },
     "aib": {
       "buy": 59.15,
-      "sell": 61.07,
+      "sell": 60.94,
       "source": "https://banklive.net/en/currency-exchange-rates-in-arab-international-bank-aib",
-      "fetchedAt": "2026-10-01T13:16:09.168Z"
+      "fetchedAt": "2026-10-01T19:32:02.913Z"
     }
   }
 }
